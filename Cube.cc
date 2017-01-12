@@ -67,12 +67,24 @@ void CubePiece::rotate(DirectionE dir)
 // Cube class implements
 //
 
-Cube::Cube()
+Cube::Cube(int dim)
 {
+	if (dim < 2 || dim > 12) dim = 3;
+
+	N = dim;
+
+	elem = new CubePiece**[N];
+	for (int x=0; x<N; x++) {
+		elem[x] = new CubePiece*[N];
+		for (int y=0; y<N; y++) {
+			elem[x][y] = new CubePiece[N];
+		}
+	}
 }
 
 Cube::~Cube()
 {
+	delete[] elem;
 }
 
 RotateAxisE Cube::getAxis(DirectionE dir)
@@ -153,7 +165,7 @@ int Cube::getRotateRow(DirectionE dir)
 		case RIGHT_CCW:
 		case BACK_CW:
 		case BACK_CCW:
-			idx = 2;
+			idx = (N-1);
 			break;
 	}
 
@@ -164,11 +176,11 @@ void Cube::rotate(DirectionE dir)
 {
 	int row = getRotateRow(dir);
 
-	CubePiece* pCube[3][3];	// for easy rotating
+	CubePiece* pCube[N][N];	// for easy rotating
 	memset(pCube, 0, sizeof(pCube));
 
-	for (int i=0; i<3; i++) {
-		for (int j=0; j<3; j++) {
+	for (int i=0; i<N; i++) {
+		for (int j=0; j<N; j++) {
 			switch( getAxis(dir) ) {
 				case AXIS_X:
 					pCube[i][j] = & elem[row][i][j];
@@ -188,20 +200,20 @@ void Cube::rotate(DirectionE dir)
 	CubePiece tmp;
 
 	if (getRotateDirection(dir) == ROTATE_CW) {
-		for (int k=0; k<N; k++) {
+		for (int k=0; k<N-1; k++) {
 			tmp = *pCube[k][0];
-			*pCube[k][0]	= *pCube[0][N-k];
-			*pCube[0][N-k]	= *pCube[N-k][N];
-			*pCube[N-k][N]	= *pCube[N][k];
-			*pCube[N][k]	= tmp;
+			*pCube[k][0]		= *pCube[0][N-1-k];
+			*pCube[0][N-1-k]	= *pCube[N-1-k][N-1];
+			*pCube[N-1-k][N-1]	= *pCube[N-1][k];
+			*pCube[N-1][k]		= tmp;
 		}
 	} else {
-		for (int k=0; k<N; k++) {
+		for (int k=0; k<N-1; k++) {
 			tmp = *pCube[k][0];
-			*pCube[k][0]	= *pCube[N][k];
-			*pCube[N][k]	= *pCube[N-k][N];
-			*pCube[N-k][N]	= *pCube[0][N-k];
-			*pCube[0][N-k]	= tmp;
+			*pCube[k][0]		= *pCube[N-1][k];
+			*pCube[N-1][k]		= *pCube[N-1-k][N-1];
+			*pCube[N-1-k][N-1]	= *pCube[0][N-1-k];
+			*pCube[0][N-1-k]	= tmp;
 		}
 	}
 }
@@ -210,9 +222,9 @@ void Cube::rotate(DirectionE dir)
 void Cube::output(void)
 {
 	// TOP
-	for (int d=3; d>0; d--) {
-		fprintf(stderr, "%*s|", 1+6+1, " ");
-		for (int x=0; x<3; x++) {
+	for (int d=N; d>0; d--) {
+		fprintf(stderr, "%*s|", 1+(N*2)+1, " ");
+		for (int x=0; x<N; x++) {
 			fprintf(stderr, " %d", elem[x][0][d-1].top);
 		}
 		fprintf(stderr, " |\n");
@@ -220,34 +232,34 @@ void Cube::output(void)
 
 	fprintf(stderr, "---------------------------------\n");
 
-	for (int y=0; y<3; y++) {
+	for (int y=0; y<N; y++) {
 
 		fprintf(stderr, "|");
 
 		// LEFT
-		for (int d=3; d>0; d--) {
+		for (int d=N; d>0; d--) {
 			fprintf(stderr, " %d", elem[0][y][d-1].left);
 		}
 
 		fprintf(stderr, " |");
 
 		// FRONT
-		for (int x=0; x<3; x++) {
+		for (int x=0; x<N; x++) {
 			fprintf(stderr, " %d", elem[x][y][0].front);
 		}
 
 		fprintf(stderr, " |");
 
 		// RIGHT
-		for (int d=0; d<3; d++) {
-			fprintf(stderr, " %d", elem[2][y][d].right);
+		for (int d=0; d<N; d++) {
+			fprintf(stderr, " %d", elem[N-1][y][d].right);
 		}
 
 		fprintf(stderr, " |");
 
 		// BACK
-		for (int x=3; x>0; x--) {
-			fprintf(stderr, " %d", elem[x-1][y][2].back);
+		for (int x=N; x>0; x--) {
+			fprintf(stderr, " %d", elem[x-1][y][N-1].back);
 		}
 
 		fprintf(stderr, " |\n");
@@ -256,10 +268,10 @@ void Cube::output(void)
 	fprintf(stderr, "---------------------------------\n");
 
 	// BOTTOM
-	for (int d=0; d<3; d++) {
-		fprintf(stderr, "%*s|", 1+6+1, " ");
-		for (int x=0; x<3; x++) {
-			fprintf(stderr, " %d", elem[x][2][d-1].down);
+	for (int d=0; d<N; d++) {
+		fprintf(stderr, "%*s|", 1+(N*2)+1, " ");
+		for (int x=0; x<N; x++) {
+			fprintf(stderr, " %d", elem[x][N-1][d].down);
 		}
 		fprintf(stderr, " |\n");
 	}

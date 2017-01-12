@@ -1,50 +1,75 @@
 
 #include <stdio.h>
+#include <string.h>
 
 #include "Cube.hh"
 
 
-Cube cube;
+Cube cube(5);
 
 int main(int argc, char** argv)
 {
-	int key;
+	char cmd[128];
+	int len;
 
 	cube.output();
 
-	while((key = getchar()) > 0) {
-		if (key == 'x') break;
+	fprintf(stderr, " press 'q' to quit! \n");
 
-		if (key == 'w') {
-			cube.rotate(UP_CW);
-		} else if (key == 's') {
-			cube.rotate(DOWN_CW);
-		} else if (key == 'a') {
-			cube.rotate(LEFT_CW);
-		} else if (key == 'd') {
-			cube.rotate(RIGHT_CW);
-		} else if (key == 'q') {
-			cube.rotate(FRONT_CW);
-		} else if (key == 'e') {
-			cube.rotate(BACK_CW);
-		} else if (key == 'W') {
-			cube.rotate(UP_CCW);
-		} else if (key == 'S') {
-			cube.rotate(DOWN_CCW);
-		} else if (key == 'A') {
-			cube.rotate(LEFT_CCW);
-		} else if (key == 'D') {
-			cube.rotate(RIGHT_CCW);
-		} else if (key == 'Q') {
-			cube.rotate(FRONT_CCW);
-		} else if (key == 'E') {
-			cube.rotate(BACK_CCW);
+	do {
+		if (fgets(cmd, sizeof(cmd), stdin) <= 0) {
+			break;
+		}
+
+		len = strlen(cmd);
+		cmd[len-1] = '\0';
+
+		char* p = &cmd[0];
+		if (*p == 'q')	break;
+
+		for (; *p; p++) {
+
+			int dir = -1;
+			bool twice = false;
+
+			if (*p == 'u') {
+				dir = UP_CW;
+			} else if (*p == 'd') {
+				dir = DOWN_CW;
+			} else if (*p == 'l') {
+				dir = LEFT_CW;
+			} else if (*p == 'r') {
+				dir = RIGHT_CW;
+			} else if (*p == 'f') {
+				dir = FRONT_CW;
+			} else if (*p == 'b') {
+				dir = BACK_CW;
+			} 
+
+			if (*(p+1) == '\'') {
+				dir++;
+				p++;
+			}
+
+			if (*(p+1) == '2') {
+				twice = true;
+				p++;
+			}
+
+			if (dir >= 0 && dir <= BACK_CCW) {
+				cube.rotate( (DirectionE)dir );
+				if (twice) 
+					cube.rotate( (DirectionE)dir );
+
+			} else {
+				fprintf(stderr, " pass wrong cmd : %p\n", *p);
+			}
 		}
 
 		cube.output();
-	}
+		fprintf(stderr, "\n");
 
-	printf("--\n");
+	} while(1);
 	
 	return 0;
 }

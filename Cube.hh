@@ -60,8 +60,6 @@ public:
 };
 
 
-#define N  ((3)-1)
-
 /**
  * @class   Cube
  * @brief   
@@ -69,7 +67,7 @@ public:
 class Cube
 {
 public:
-	Cube();
+	Cube(int dim = 3);
 	virtual ~Cube();
 
 	virtual void rotate(DirectionE dir);
@@ -81,7 +79,8 @@ public:
 	void output();
 
 protected:
-	CubePiece  elem[3][3][3];
+	int			N;
+	CubePiece***  elem;
 
 private:
 
