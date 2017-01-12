@@ -22,11 +22,10 @@ void COLOR(ColorE  col)
 		{ 0.9, 0.9, 0.9 },
 	};
 
-	//printf("color :%d -> %f %f %f\n", col, colors[col][0], colors[col][1], colors[col][2]);
 	glColor3f(colors[col][0], colors[col][1], colors[col][2]);
 }
 
-float scale = 0.9;
+float scale = 0.95;
 float a = 1.0;
 
 
@@ -35,14 +34,16 @@ CubePiece::CubePiece()
 	reset();
 }
 
-CubePiece::CubePiece(CubePiece& s)
+CubePiece& CubePiece::operator= (const CubePiece& r)
 {
-	top = s.top;
-	left = s.left;
-	right = s.right;
-	front = s.front;
-	back = s.back;
-	bottom = s.bottom;
+	top = r.top;
+	left = r.left;
+	right = r.right;
+	front = r.front;
+	back = r.back;
+	bottom = r.bottom;
+
+	return *this;
 }
 
 void CubePiece::reset()
@@ -217,7 +218,6 @@ void Cube::rotate(DirectionE dir)
 	}
 
 	startRotate();
-
 }
 
 void Cube::startRotate()
@@ -249,15 +249,42 @@ void Cube::rotateCommit(int h)
 	switch (curDir) {
 		case UP_CW:
 		case BOTTOM_CCW:
-			//tmp=left; left=front; front=right; right=back; back=tmp; break;
+			tmp = elem[0][h][0];
+			elem[0][h][0] = elem[2][h][0];
+			elem[2][h][0] = elem[2][h][2];
+			elem[2][h][2] = elem[0][h][2];
+			elem[0][h][2] = tmp;
+			tmp = elem[1][h][0];
+			elem[1][h][0] = elem[2][h][1];
+			elem[2][h][1] = elem[1][h][2];
+			elem[1][h][2] = elem[0][h][1];
+			elem[0][h][1] = tmp;
 			break;
 		case UP_CCW:
 		case BOTTOM_CW:
-			//tmp=left; left=back; back=right; right=front; front=tmp; break;
+			tmp = elem[0][h][0];
+			elem[0][h][0] = elem[0][h][2];
+			elem[0][h][2] = elem[2][h][2];
+			elem[2][h][2] = elem[2][h][0];
+			elem[2][h][0] = tmp;
+			tmp = elem[1][h][0];
+			elem[1][h][0] = elem[0][h][1];
+			elem[0][h][1] = elem[1][h][2];
+			elem[1][h][2] = elem[2][h][1];
+			elem[2][h][1] = tmp;
 			break;
 		case LEFT_CCW:
 		case RIGHT_CW:
-			//tmp=top; top=front; front=bottom; bottom=back; back=tmp; break;
+			tmp = elem[h][0][0];
+			elem[h][0][0] = elem[h][2][0];
+			elem[h][2][0] = elem[h][2][2];
+			elem[h][2][2] = elem[h][0][2];
+			elem[h][0][2] = tmp;
+			tmp = elem[h][1][0];
+			elem[h][1][0] = elem[h][1][0];
+			elem[h][1][0] = elem[h][2][1];
+			elem[h][2][1] = elem[h][1][2];
+			elem[h][1][2] = tmp;
 			break;
 		case LEFT_CW:
 		case RIGHT_CCW:
@@ -285,15 +312,22 @@ void Cube::rotateCommit(int h)
 			elem[0][1][h] = elem[1][2][h];
 			elem[1][2][h] = elem[2][1][h];
 			elem[2][1][h] = tmp;
-
-			//tmp=top; top=left; left=bottom; bottom=right; right=tmp; break;
 			break;
 		case FRONT_CCW:
 		case BACK_CW:
-			//tmp=top; top=right; right=bottom; bottom=left; left=tmp; break;
+			tmp = elem[0][0][h];
+			elem[0][0][h] = elem[2][0][h];
+			elem[2][0][h] = elem[2][2][h];
+			elem[2][2][h] = elem[0][2][h];
+			elem[0][2][h] = tmp;
+			tmp = elem[1][0][h];
+			elem[1][0][h] = elem[1][0][h];
+			elem[1][0][h] = elem[2][1][h];
+			elem[2][1][h] = elem[1][2][h];
+			elem[1][2][h] = tmp;
 			break;
 	}
-
+#if 0
 	fprintf(stderr,  " Rotate dir=%d axis=%d  h=%d\n", curDir, selax, h);
 	for (int y=0; y<3; y++) {
 		for (int x=0; x<3; x++) {
@@ -302,6 +336,27 @@ void Cube::rotateCommit(int h)
 		fprintf(stderr, "\n");
 	}
 	fprintf(stderr, "--------\n");
+#endif
+}
+
+void Cube::drawArrow()
+{
+	glPushMatrix();
+
+	glTranslatef(0,0,6);
+	glBegin(GL_TRIANGLES);
+		glColor3f(1,0,0);
+		glVertex3f(0,0,0);
+		glVertex3f(0.5,0,1);
+		glVertex3f(0,0,0.8);
+
+		glColor3f(1,1,1);
+		glVertex3f(0,0,0);
+		glVertex3f(0,0,0.8);
+		glVertex3f(0,0.5,1);
+	glEnd();
+
+	glPopMatrix();
 }
 
 void Cube::draw()
@@ -311,39 +366,22 @@ void Cube::draw()
 	}
 
 	for (int h=0; h<3; h++) {
+		if (rotating && h == selnum) {
+			// for animation
+			glPushMatrix();
+			glRotatef(angle, (selax==AXIS_X)?1:0,
+					(selax==AXIS_Y)?1:0,
+					(selax==AXIS_Z)?1:0);
+		}
+
 		switch (selax) {
-			case AXIS_X:
-				if (rotating && h == selnum) {
-					glPushMatrix();
-					glRotatef(angle, 1,0,0);
-					drawAxisXLayer(h);
-					glPopMatrix();
-				} else 
-					drawAxisXLayer(h);
-				break;
+			case AXIS_X: drawAxisXLayer(h); break;
+			case AXIS_Y: drawAxisYLayer(h); break;
+			case AXIS_Z: drawAxisZLayer(h); break;
+		}
 
-			case AXIS_Y:
-				if (rotating && h == selnum) {
-					glPushMatrix();
-					glRotatef(angle, 0,1,0);
-					drawAxisYLayer(h);
-					glPopMatrix();
-				} else 
-					drawAxisYLayer(h);
-				break;
-
-			case AXIS_Z:
-				if (rotating && h == selnum) {
-					glPushMatrix();
-					glRotatef(angle, 0,0,1);
-					drawAxisZLayer(h);
-					glPopMatrix();
-				} else 
-					drawAxisZLayer(h);
-				break;
-
-			default:
-				break;
+		if (rotating && h == selnum) {
+			glPopMatrix();
 		}
 	}
 
@@ -351,8 +389,10 @@ void Cube::draw()
 		rotating = false;
 		rotateCommit(selnum);
 
-		glutPostRedisplay();
+		//glutPostRedisplay();
 	}
+
+	drawArrow();
 }
 
 void Cube::drawAxisXLayer(int h)

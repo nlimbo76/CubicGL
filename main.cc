@@ -5,10 +5,6 @@
 
 Cube cube;
 
-float cubeX = 0.0;
-float cubeY = 0.0;
-float cubeZ = -20.0;
- 
 float pitch = 10.0;
 float yaw = -30.0;
 float roll = 0.0;
@@ -38,8 +34,8 @@ void reshape(GLsizei width, GLsizei height)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity(); 
  
-    //Field of view angle(단위 degrees), 윈도우의 aspect ratio, Near와 Far Plane설정
-    gluPerspective(45, (GLfloat)width / (GLfloat)height, 1.0, 100.0); 
+    //gluPerspective(50, (GLfloat)width / (GLfloat)height, 1.0, 100.0); 
+	glFrustum(-1,1, -1,1, 1, 100);
  
     glMatrixMode(GL_MODELVIEW);
 }
@@ -99,35 +95,15 @@ void display()
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 #endif
 
-#if 1
-    glTranslatef(cubeX, cubeY, cubeZ);
+    glTranslatef(0, 0, -10);
     glRotatef(pitch, 1.0, 0.0, 0.0);
     glRotatef(yaw, 0.0, 1.0, 0.0);
     glRotatef(roll, 0.0, 0.0, 1.0);
-#endif
 
-#if 1
-	glPushMatrix();
-		glColor3f(0,1,0);
-		glTranslatef(0,0,6);
-		glBegin(GL_TRIANGLES);
-			glVertex3f(1,0,1);
-			glVertex3f(0,0,0);
-			glVertex3f(0,0,1);
-#if 0
-			glVertex3f(0,0,0);
-			glVertex3f(0,0,1);
-			glVertex3f(0,1,1);
-#endif
-		glEnd();
-	glPopMatrix();
-    //glFlush();
-#endif
 
- 
 	cube.draw();
 
-    //draw_line();
+    draw_line();
  
     glutSwapBuffers();
 }
@@ -155,30 +131,6 @@ void keyboard(unsigned char key, int x, int y)
     {
         roll -= 5.0;
     }
-    else if (key == 113) //q
-    {
-        cubeZ += 0.1;
-    }
-    else if (key == 119) //w
-    {
-        cubeZ -= 0.1;
-    }
-    else if (key == 97) //a
-    {
-        cubeY += 0.1;
-    }
-    else if (key == 115) //s
-    {
-        cubeY -= 0.1;
-    }
-    else if (key == 122) //z
-    {
-        cubeX += 0.1;
-    }
-    else if (key == 120) //x
-    {
-        cubeX -= 0.1;
-    } else 
 #endif
 
 	if (key == 'w') {

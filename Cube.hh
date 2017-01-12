@@ -37,7 +37,8 @@ class CubePiece
 {
 public:
 	CubePiece();
-	CubePiece(CubePiece& s);
+
+	CubePiece& operator= (const CubePiece& r);
 
 	void rotate(DirectionE dir);
 	void draw();
@@ -68,6 +69,8 @@ public:
 	void drawAxisXLayer(int h);
 	void drawAxisYLayer(int h);
 	void drawAxisZLayer(int h);
+
+	void drawArrow();
 
 	void rotate(DirectionE dir);
 	void rotateCommit(int h);
