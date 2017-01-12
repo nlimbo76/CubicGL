@@ -27,7 +27,7 @@ float scale = 0.95;
 float a = 1.0;
 
 
-CubeGL::CubeGL() : Cube()
+CubeGL::CubeGL(int dim) : Cube(dim)
 {
 	rotating = false;
 	angle = 0;
@@ -65,7 +65,7 @@ void CubeGL::draw()
 		angle += seldeg;
 	}
 
-	for (int h=0; h<3; h++) {
+	for (int h=0; h<N; h++) {
 		if (rotating && h == selnum) {
 			// for animation
 			glPushMatrix();
@@ -96,7 +96,7 @@ void CubeGL::draw()
 	drawArrow();
 }
 
-void CubeGL::drawPiece(CubePiece& piece)
+void CubeGL::drawPiece(const CubePiece& piece)
 {
 	glPushMatrix();
 
@@ -151,14 +151,14 @@ void CubeGL::drawPiece(CubePiece& piece)
 void CubeGL::drawAxisXLayer(int h)
 {
 	glPushMatrix();
-	glTranslatef((h-1)*2, 2, 2);
+	glTranslatef((h-(N/2))*2, (N/2)*2, (N/2)*2);
 
-	for (int i=0; i<3; i++) {
-		for (int j=0; j<3; j++) {
+	for (int i=0; i<N; i++) {
+		for (int j=0; j<N; j++) {
 			drawPiece(elem[h][i][j]);
 			glTranslatef(0,0,-2);
 		}
-		glTranslatef(0,-2,6);
+		glTranslatef(0,-2,(N*2));
 	}
 	glPopMatrix();
 }
@@ -166,14 +166,14 @@ void CubeGL::drawAxisXLayer(int h)
 void CubeGL::drawAxisYLayer(int h)
 {
 	glPushMatrix();
-	glTranslatef(-2, (1-h)*2, 2);
+	glTranslatef((N/2)*-2, ((N/2)-h)*2, (N/2)*2);
 
-	for (int i=0; i<3; i++) {
-		for (int j=0; j<3; j++) {
+	for (int i=0; i<N; i++) {
+		for (int j=0; j<N; j++) {
 			drawPiece(elem[i][h][j]);
 			glTranslatef(0,0,-2);
 		}
-		glTranslatef(2,0,6);
+		glTranslatef(2,0,(N*2));
 	}
 	glPopMatrix();
 }
@@ -181,14 +181,14 @@ void CubeGL::drawAxisYLayer(int h)
 void CubeGL::drawAxisZLayer(int h)
 {
 	glPushMatrix();
-	glTranslatef(-2, 2, (1-h)*2);
+	glTranslatef((N/2)*-2, (N/2)*2, ((N/2)-h)*2);
 
-	for (int i=0; i<3; i++) {
-		for (int j=0; j<3; j++) {
+	for (int i=0; i<N; i++) {
+		for (int j=0; j<N; j++) {
 			drawPiece(elem[i][j][h]);
 			glTranslatef(0,-2,0);
 		}
-		glTranslatef(2,6,0);
+		glTranslatef(2,(N*2),0);
 	}
 	glPopMatrix();
 }

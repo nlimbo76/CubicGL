@@ -16,7 +16,7 @@
 class CubeGL : public Cube
 {
 public:
-	CubeGL();
+	CubeGL(int dim = 3);
 	virtual ~CubeGL();
 
 	void draw();
@@ -24,7 +24,7 @@ public:
 	void drawAxisYLayer(int h);
 	void drawAxisZLayer(int h);
 
-	void drawPiece(CubePiece& piece);
+	void drawPiece(const CubePiece& piece);
 	void drawArrow();
 
 	virtual void rotate(DirectionE dir);

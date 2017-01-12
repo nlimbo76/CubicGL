@@ -179,20 +179,20 @@ void Cube::rotate(DirectionE dir)
 	CubePiece* pCube[N][N];	// for easy rotating
 	memset(pCube, 0, sizeof(pCube));
 
-	for (int i=0; i<N; i++) {
-		for (int j=0; j<N; j++) {
+	for (int x=0; x<N; x++) {
+		for (int y=0; y<N; y++) {
 			switch( getAxis(dir) ) {
 				case AXIS_X:
-					pCube[i][j] = & elem[row][i][j];
+					pCube[x][y] = & elem[row][x][y];
 					break;
 				case AXIS_Y:
-					pCube[i][j] = & elem[i][row][j];
+					pCube[x][y] = & elem[x][row][y];
 					break;
 				case AXIS_Z:
-					pCube[i][j] = & elem[j][i][row];
+					pCube[x][y] = & elem[y][x][row];
 					break;
 			}
-			pCube[i][j]->rotate(dir);
+			pCube[x][y]->rotate(dir);
 		}
 	}
 
@@ -200,20 +200,36 @@ void Cube::rotate(DirectionE dir)
 	CubePiece tmp;
 
 	if (getRotateDirection(dir) == ROTATE_CW) {
-		for (int k=0; k<N-1; k++) {
-			tmp = *pCube[k][0];
-			*pCube[k][0]		= *pCube[0][N-1-k];
-			*pCube[0][N-1-k]	= *pCube[N-1-k][N-1];
-			*pCube[N-1-k][N-1]	= *pCube[N-1][k];
-			*pCube[N-1][k]		= tmp;
+		for (int base=0; base<N/2; base++) {
+
+			int s=base;		// start element
+			int e=N-base-1;	// end element
+
+			for (int k=s; k<e; k++) {
+				int j = e - k + s;
+
+				tmp				= *pCube[k][s];
+				*pCube[k][s]	= *pCube[s][j];
+				*pCube[s][j]	= *pCube[j][e];
+				*pCube[j][e]	= *pCube[e][k];
+				*pCube[e][k]	= tmp;
+			}
 		}
 	} else {
-		for (int k=0; k<N-1; k++) {
-			tmp = *pCube[k][0];
-			*pCube[k][0]		= *pCube[N-1][k];
-			*pCube[N-1][k]		= *pCube[N-1-k][N-1];
-			*pCube[N-1-k][N-1]	= *pCube[0][N-1-k];
-			*pCube[0][N-1-k]	= tmp;
+		for (int base=0; base<N/2; base++) {
+
+			int s=base;		// start element
+			int e=N-base-1;	// end element
+
+			for (int k=s; k<e; k++) {
+				int j = e - k + s;
+
+				tmp				= *pCube[k][s];
+				*pCube[k][s]	= *pCube[e][k];
+				*pCube[e][k]	= *pCube[j][e];
+				*pCube[j][e]	= *pCube[s][j];
+				*pCube[s][j]	= tmp;
+			}
 		}
 	}
 }

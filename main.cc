@@ -3,7 +3,7 @@
 
 #include "CubeGL.hh"
 
-CubeGL cube;
+CubeGL cube(3);
 
 float pitch = 30.0;
 float yaw = -30.0;
@@ -34,8 +34,8 @@ void reshape(GLsizei width, GLsizei height)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity(); 
  
-    //gluPerspective(50, (GLfloat)width / (GLfloat)height, 1.0, 100.0); 
-	glFrustum(-1,1, -1,1, 1, 100);
+    gluPerspective(45, (GLfloat)width / (GLfloat)height, 1.0, 100.0); 
+	//glFrustum(-1,1, -1,1, 1, 100);
  
     glMatrixMode(GL_MODELVIEW);
 }
@@ -95,7 +95,7 @@ void display()
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 #endif
 
-    glTranslatef(0, 0, -10);
+    glTranslatef(0, 0, -30);
     glRotatef(pitch, 1.0, 0.0, 0.0);
     glRotatef(yaw, 0.0, 1.0, 0.0);
     glRotatef(roll, 0.0, 0.0, 1.0);

@@ -5,7 +5,7 @@
 #include "Cube.hh"
 
 
-Cube cube(5);
+Cube cube(3);
 
 int main(int argc, char** argv)
 {
