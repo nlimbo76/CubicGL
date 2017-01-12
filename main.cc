@@ -1,11 +1,11 @@
 
 #include <GL/glut.h>
 
-#include "Cube.hh"
+#include "CubeGL.hh"
 
-Cube cube;
+CubeGL cube;
 
-float pitch = 10.0;
+float pitch = 30.0;
 float yaw = -30.0;
 float roll = 0.0;
 
@@ -24,7 +24,7 @@ void init()
 	//glEnable(GL_CULL_FACE);
 
 	glPolygonMode(GL_FRONT, GL_FILL);
-	//glPolygonMode(GL_BACK, GL_LINE);
+	glPolygonMode(GL_BACK, GL_LINE);
 }
 
 void reshape(GLsizei width, GLsizei height) 
@@ -136,7 +136,7 @@ void keyboard(unsigned char key, int x, int y)
 	if (key == 'w') {
 		cube.rotate(UP_CW);
 	} else if (key == 's') {
-		cube.rotate(BOTTOM_CW);
+		cube.rotate(DOWN_CW);
 	} else if (key == 'a') {
 		cube.rotate(LEFT_CW);
 	} else if (key == 'd') {
@@ -148,7 +148,7 @@ void keyboard(unsigned char key, int x, int y)
 	} else if (key == 'W') {
 		cube.rotate(UP_CCW);
 	} else if (key == 'S') {
-		cube.rotate(BOTTOM_CCW);
+		cube.rotate(DOWN_CCW);
 	} else if (key == 'A') {
 		cube.rotate(LEFT_CCW);
 	} else if (key == 'D') {
@@ -222,7 +222,7 @@ int main(int argc, char** argv)
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 
     glutInitWindowSize(500, 500);
-    glutInitWindowPosition(1000, 700);
+    glutInitWindowPosition(1000, 900);
     glutCreateWindow("OpenGL Example");
 
 	init();

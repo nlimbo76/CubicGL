@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 		if (key == 'w') {
 			cube.rotate(UP_CW);
 		} else if (key == 's') {
-			cube.rotate(BOTTOM_CW);
+			cube.rotate(DOWN_CW);
 		} else if (key == 'a') {
 			cube.rotate(LEFT_CW);
 		} else if (key == 'd') {
@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 		} else if (key == 'W') {
 			cube.rotate(UP_CCW);
 		} else if (key == 'S') {
-			cube.rotate(BOTTOM_CCW);
+			cube.rotate(DOWN_CCW);
 		} else if (key == 'A') {
 			cube.rotate(LEFT_CCW);
 		} else if (key == 'D') {

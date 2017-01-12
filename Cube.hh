@@ -22,7 +22,7 @@ enum DirectionE {
 	UP_CW, UP_CCW,
 	LEFT_CW, LEFT_CCW,
 	RIGHT_CW, RIGHT_CCW,
-	BOTTOM_CW, BOTTOM_CCW,
+	DOWN_CW, DOWN_CCW,
 	FRONT_CW, FRONT_CCW,
 	BACK_CW, BACK_CCW,
 };
@@ -33,6 +33,11 @@ enum RotateAxisE {
 	AXIS_Z,
 };
 
+enum RotateDirE {
+	ROTATE_CW,
+	ROTATE_CCW,
+};
+
 class CubePiece
 {
 public:
@@ -41,7 +46,6 @@ public:
 	CubePiece& operator= (const CubePiece& r);
 
 	void rotate(DirectionE dir);
-	void draw();
 
 	void reset();
 
@@ -52,8 +56,11 @@ public:
 	ColorE  right; 
 	ColorE  front; 
 	ColorE  back; 
-	ColorE  bottom; 
+	ColorE  down; 
 };
+
+
+#define N  ((3)-1)
 
 /**
  * @class   Cube
@@ -65,28 +72,16 @@ public:
 	Cube();
 	virtual ~Cube();
 
-	void draw();
-	void drawAxisXLayer(int h);
-	void drawAxisYLayer(int h);
-	void drawAxisZLayer(int h);
+	virtual void rotate(DirectionE dir);
 
-	void drawArrow();
+	RotateAxisE	getAxis(DirectionE dir);
+	RotateDirE	getRotateDirection(DirectionE dir);
+	int			getRotateRow(DirectionE dir);
 
-	void rotate(DirectionE dir);
-	void rotateCommit(int h);
-	void startRotate();
-	bool isRotating() { return rotating; }
+	void output();
 
 protected:
 	CubePiece  elem[3][3][3];
-
-	bool	rotating;
-	int		angle;
-
-	DirectionE curDir;
-	int		selnum;
-	int		seldeg;
-	RotateAxisE	selax;
 
 private:
 

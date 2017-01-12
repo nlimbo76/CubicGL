@@ -32,6 +32,7 @@ CubeGL::CubeGL() : Cube()
 	rotating = false;
 	angle = 0;
 
+	selax = AXIS_X;
 }
 
 CubeGL::~CubeGL()
@@ -86,8 +87,8 @@ void CubeGL::draw()
 
 	if (rotating == true && (angle <= -90 || angle >= 90)) {
 		rotating = false;
-		//Cube::rotate();
-		Cube::rotateCommit(selnum);
+
+		Cube::rotate(seldir);
 
 		glutPostRedisplay();
 	}
@@ -136,7 +137,7 @@ void CubeGL::drawPiece(CubePiece& piece)
 		glVertex3f(-a, 1, -a);
 		glVertex3f(-a, 1,  a);
 
-		COLOR(piece.bottom);
+		COLOR(piece.down);
 		glNormal3f(0, -1, 0);
 		glVertex3f( a, -1,  a);
 		glVertex3f(-a, -1,  a);
@@ -195,88 +196,16 @@ void CubeGL::drawAxisZLayer(int h)
 void CubeGL::rotate(DirectionE dir)
 {
 	if (rotating == true) return;
-	curDir = dir;
 
-	switch (dir) {
-		case UP_CW:
-		case UP_CCW:
-		case LEFT_CW:
-		case LEFT_CCW:
-		case FRONT_CW:
-		case FRONT_CCW:
-			selnum = 0;
-			break;
+	seldir = dir;
+	selnum = getRotateRow(dir);
+	selax = getAxis(dir);
 
-		case BOTTOM_CW:
-		case BOTTOM_CCW:
-		case RIGHT_CW:
-		case RIGHT_CCW:
-		case BACK_CW:
-		case BACK_CCW:
-			selnum = 2;
-			break;
+	if (getRotateDirection(dir) == ROTATE_CW) {
+		seldeg = 10;
+	} else {
+		seldeg = -10;
 	}
-
-	switch (dir) {
-		case LEFT_CW:
-		case LEFT_CCW:
-		case RIGHT_CW:
-		case RIGHT_CCW:
-			selax = AXIS_X;
-			break;
-
-		case UP_CW:
-		case UP_CCW:
-		case BOTTOM_CW:
-		case BOTTOM_CCW:
-			selax = AXIS_Y;
-			break;
-
-		case FRONT_CW:
-		case FRONT_CCW:
-		case BACK_CW:
-		case BACK_CCW:
-			selax = AXIS_Z;
-			break;
-	}
-
-	switch (dir) {
-		case UP_CCW:
-		case LEFT_CW:
-		case RIGHT_CCW:
-		case BOTTOM_CW:
-		case FRONT_CCW:
-		case BACK_CW:
-			seldeg = 10;
-			break;
-
-		case UP_CW:
-		case LEFT_CCW:
-		case RIGHT_CW:
-		case BOTTOM_CCW:
-		case FRONT_CW:
-		case BACK_CCW:
-			seldeg = -10;
-			break;
-	}
-
-#if 0
-	for (int i=0; i<3; i++) {
-		for (int j=0; j<3; j++) {
-			switch(selax) {
-				case AXIS_X:
-					pCube[i][j] = & elem[selnum][i][j];
-					break;
-				case AXIS_Y:
-					pCube[i][j] = & elem[i][selnum][j];
-					break;
-				case AXIS_Z:
-					pCube[i][j] = & elem[j][i][selnum];
-					break;
-			}
-		}
-	}
-#endif
 
 	startRotate();
 }

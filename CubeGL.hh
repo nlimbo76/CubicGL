@@ -34,6 +34,11 @@ public:
 
 protected:
 
+	DirectionE	seldir;
+	RotateAxisE	selax;
+	int		seldeg;
+	int		selnum;
+
 	bool	rotating;
 	int		angle;
 
