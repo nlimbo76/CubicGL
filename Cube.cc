@@ -36,28 +36,27 @@ void CubePiece::reset()
 	down = WHITE;
 }
 
-void CubePiece::rotate(DirectionE dir)
+void CubePiece::rotate(RotateAxisE& ax, RotateDirE& dir)
 {
 	ColorE tmp;
-	switch (dir) {
-		case UP_CW:
-		case DOWN_CCW:
-			tmp=left; left=front; front=right; right=back; back=tmp; break;
-		case UP_CCW:
-		case DOWN_CW:
-			tmp=left; left=back; back=right; right=front; front=tmp; break;
-		case LEFT_CCW:
-		case RIGHT_CW:
-			tmp=top; top=front; front=down; down=back; back=tmp; break;
-		case LEFT_CW:
-		case RIGHT_CCW:
-			tmp=top; top=back; back=down; down=front; front=tmp; break;
-		case FRONT_CW:
-		case BACK_CCW:
-			tmp=top; top=left; left=down; down=right; right=tmp; break;
-		case FRONT_CCW:
-		case BACK_CW:
-			tmp=top; top=right; right=down; down=left; left=tmp; break;
+	if (ax == AXIS_X) {
+		if (dir == ROTATE_CW) {
+			tmp=top; top=back; back=down; down=front; front=tmp;
+		} else {
+			tmp=top; top=front; front=down; down=back; back=tmp;
+		}
+	} else if (ax == AXIS_Y) {
+		if (dir == ROTATE_CW) {
+			tmp=left; left=back; back=right; right=front; front=tmp;
+		} else {
+			tmp=left; left=front; front=right; right=back; back=tmp;
+		}
+	} else {
+		if (dir == ROTATE_CW) {
+			tmp=top; top=right; right=down; down=left; left=tmp;
+		} else {
+			tmp=top; top=left; left=down; down=right; right=tmp;
+		}
 	}
 }
 
@@ -172,66 +171,149 @@ int Cube::getRotateRow(DirectionE dir)
 	return idx;
 }
 
+bool Cube::parseCommand(const char* cmd, ActionT& act)
+{
+	int len = strlen(cmd);
+
+	if (len <= 0) return false;
+
+	int idx = 0;
+	bool reverse = false;
+	bool twice_rotate = false;
+	RotateAxisE	ax;
+	RotateDirE	cw;
+
+	if (len > 1) {
+		if (cmd[1] == '\'') {	// reverse
+			reverse = true;
+		} else if (cmd[1] == '2') {	// twice rotate
+			twice_rotate = true;
+		}
+	}
+
+	switch (cmd[0]) {
+		case 'u':	ax=AXIS_Y;	cw=ROTATE_CCW;	idx=1<<0;		break;
+		case 'd':	ax=AXIS_Y;	cw=ROTATE_CW;	idx=1<<(N-1);	break;
+		case 'f':	ax=AXIS_Z;	cw=ROTATE_CCW;	idx=1<<0;		break;
+		case 'b':	ax=AXIS_Z;	cw=ROTATE_CW; 	idx=1<<(N-1);	break;
+		case 'l':	ax=AXIS_X;	cw=ROTATE_CW; 	idx=1<<0;		break;
+		case 'r':	ax=AXIS_X;	cw=ROTATE_CCW;	idx=1<<(N-1);	break;
+
+		case 'U':	ax=AXIS_Y;	cw=ROTATE_CCW;	idx=3<<0;		break;
+		case 'D':	ax=AXIS_Y;	cw=ROTATE_CW; 	idx=3<<(N-2);	break;
+		case 'F':	ax=AXIS_Z;	cw=ROTATE_CCW;	idx=3<<0;		break;
+		case 'B':	ax=AXIS_Z;	cw=ROTATE_CW; 	idx=3<<(N-2);	break;
+		case 'L':	ax=AXIS_X;	cw=ROTATE_CW; 	idx=3<<0;		break;
+		case 'R':	ax=AXIS_X;	cw=ROTATE_CCW;	idx=3<<(N-2);	break;
+
+		case 'x':
+		case 'y':
+		case 'z':
+			return false;
+
+		default:
+			return false;
+	}
+
+	if (idx == 0) return false;
+
+	if (reverse == true)
+		cw = (cw == ROTATE_CW) ? ROTATE_CCW : ROTATE_CW;
+
+	act.ax = ax;
+	act.cw = cw;
+	act.bmCol = idx;
+	act.bDouble = twice_rotate;
+
+	return true;
+}
+
+void Cube::rotate(const char* dir)
+{
+	ActionT act;
+
+	if (parseCommand(dir, act) == false) {
+		return;
+	}
+
+	rotate(act);
+
+	if (act.bDouble) rotate(act);
+}
+
+void Cube::rotate(ActionT& act)
+{
+	CubePiece* pCube[N][N];	// for easy rotating
+
+	for (int row = 0; row < N; row++) {
+		if ((act.bmCol & (1<<row)) == 0) continue;
+
+		memset(pCube, 0, sizeof(pCube));
+
+		for (int x=0; x<N; x++) {
+			for (int y=0; y<N; y++) {
+				switch( act.ax ) {
+					case AXIS_X:
+						pCube[x][y] = & elem[row][x][y];
+						break;
+					case AXIS_Y:
+						pCube[x][y] = & elem[x][row][y];
+						break;
+					case AXIS_Z:
+						pCube[x][y] = & elem[y][x][row];
+						break;
+				}
+				pCube[x][y]->rotate(act.ax, act.cw);
+			}
+		}
+
+
+		CubePiece tmp;
+
+		if (act.cw == ROTATE_CW) {
+			for (int base=0; base<N/2; base++) {
+
+				int s=base;		// start element
+				int e=N-base-1;	// end element
+
+				for (int k=s; k<e; k++) {
+					int j = e - k + s;
+
+					tmp				= *pCube[k][s];
+					*pCube[k][s]	= *pCube[s][j];
+					*pCube[s][j]	= *pCube[j][e];
+					*pCube[j][e]	= *pCube[e][k];
+					*pCube[e][k]	= tmp;
+				}
+			}
+		} else {
+			for (int base=0; base<N/2; base++) {
+
+				int s=base;		// start element
+				int e=N-base-1;	// end element
+
+				for (int k=s; k<e; k++) {
+					int j = e - k + s;
+
+					tmp				= *pCube[k][s];
+					*pCube[k][s]	= *pCube[e][k];
+					*pCube[e][k]	= *pCube[j][e];
+					*pCube[j][e]	= *pCube[s][j];
+					*pCube[s][j]	= tmp;
+				}
+			}
+		}
+	}
+}
+
 void Cube::rotate(DirectionE dir)
 {
-	int row = getRotateRow(dir);
+	ActionT act;
+	act.ax = getAxis(dir);
+	act.cw = getRotateDirection(dir);
+	act.bmCol = 1 << getRotateRow(dir);
 
-	CubePiece* pCube[N][N];	// for easy rotating
-	memset(pCube, 0, sizeof(pCube));
-
-	for (int x=0; x<N; x++) {
-		for (int y=0; y<N; y++) {
-			switch( getAxis(dir) ) {
-				case AXIS_X:
-					pCube[x][y] = & elem[row][x][y];
-					break;
-				case AXIS_Y:
-					pCube[x][y] = & elem[x][row][y];
-					break;
-				case AXIS_Z:
-					pCube[x][y] = & elem[y][x][row];
-					break;
-			}
-			pCube[x][y]->rotate(dir);
-		}
-	}
-
-
-	CubePiece tmp;
-
-	if (getRotateDirection(dir) == ROTATE_CW) {
-		for (int base=0; base<N/2; base++) {
-
-			int s=base;		// start element
-			int e=N-base-1;	// end element
-
-			for (int k=s; k<e; k++) {
-				int j = e - k + s;
-
-				tmp				= *pCube[k][s];
-				*pCube[k][s]	= *pCube[s][j];
-				*pCube[s][j]	= *pCube[j][e];
-				*pCube[j][e]	= *pCube[e][k];
-				*pCube[e][k]	= tmp;
-			}
-		}
-	} else {
-		for (int base=0; base<N/2; base++) {
-
-			int s=base;		// start element
-			int e=N-base-1;	// end element
-
-			for (int k=s; k<e; k++) {
-				int j = e - k + s;
-
-				tmp				= *pCube[k][s];
-				*pCube[k][s]	= *pCube[e][k];
-				*pCube[e][k]	= *pCube[j][e];
-				*pCube[j][e]	= *pCube[s][j];
-				*pCube[s][j]	= tmp;
-			}
-		}
-	}
+	rotate(act);
 }
 
 

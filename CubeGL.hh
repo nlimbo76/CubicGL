@@ -20,6 +20,12 @@ public:
 	virtual ~CubeGL();
 
 	void draw();
+
+	void rotate(DirectionE dir);
+
+	bool isRotating() { return rotating; }
+
+protected:
 	void drawAxisXLayer(int h);
 	void drawAxisYLayer(int h);
 	void drawAxisZLayer(int h);
@@ -27,12 +33,7 @@ public:
 	void drawPiece(const CubePiece& piece);
 	void drawArrow();
 
-	virtual void rotate(DirectionE dir);
 	void startRotate();
-
-	bool isRotating() { return rotating; }
-
-protected:
 
 	DirectionE	seldir;
 	RotateAxisE	selax;

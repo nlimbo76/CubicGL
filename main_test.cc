@@ -29,6 +29,14 @@ int main(int argc, char** argv)
 
 		for (; *p; p++) {
 
+			cube.rotate(p);
+
+			if (strlen(p) > 1) {
+				if (*(p+1) == '\'' || *(p+1) == '2') {
+					p++;
+				}
+			}
+#if 0
 			int dir = -1;
 			bool twice = false;
 
@@ -62,8 +70,9 @@ int main(int argc, char** argv)
 					cube.rotate( (DirectionE)dir );
 
 			} else {
-				fprintf(stderr, " pass wrong cmd : %p\n", *p);
+				fprintf(stderr, " pass wrong cmd : %x\n", *p);
 			}
+#endif
 		}
 
 		cube.output();

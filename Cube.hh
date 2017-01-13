@@ -7,6 +7,7 @@
 #ifndef __CUBE_HH
 #define __CUBE_HH
 
+#define dbg(fmt, args...) do { fprintf(stderr, "dbg) " fmt, ## args ); } while(0)
 
 enum ColorE {
 	NONE,
@@ -45,7 +46,7 @@ public:
 
 	CubePiece& operator= (const CubePiece& r);
 
-	void rotate(DirectionE dir);
+	void rotate(RotateAxisE& ax, RotateDirE& dir);
 
 	void reset();
 
@@ -59,6 +60,20 @@ public:
 	ColorE  down; 
 };
 
+struct ActionT {
+	RotateAxisE	ax;
+	RotateDirE	cw;
+	int			bmCol;	// column bit-mask for multi cols.
+	bool		bDouble;
+
+	ActionT() {
+		ax = AXIS_X;
+		cw = ROTATE_CW;
+		bDouble = false;
+		bmCol = (1 << 0);
+	}
+};
+
 
 /**
  * @class   Cube
@@ -70,7 +85,8 @@ public:
 	Cube(int dim = 3);
 	virtual ~Cube();
 
-	virtual void rotate(DirectionE dir);
+	void rotate(DirectionE dir);
+	void rotate(const char* dir);
 
 	RotateAxisE	getAxis(DirectionE dir);
 	RotateDirE	getRotateDirection(DirectionE dir);
@@ -79,7 +95,10 @@ public:
 	void output();
 
 protected:
-	int			N;
+	void rotate(ActionT& act);
+	bool parseCommand(const char* cmd, ActionT& act);
+
+	int			N;		// cube dimension 
 	CubePiece***  elem;
 
 private:
