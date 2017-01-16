@@ -205,8 +205,16 @@ void mouseMove(int x, int y)
 	int dx = x - lastX;
 	int dy = y - lastY;
 
-	yaw += dx;
-	pitch += dy;
+	// scroll limit 
+	if (yaw + dx > 360) yaw = 0;
+	else if (yaw + dx < -360) yaw = 0;
+	else
+		yaw += dx;
+
+	if (pitch + dy > 85) pitch = 85;
+	else if (pitch + dy < -85) pitch = -85;
+	else
+		pitch += dy;
 
 	lastX = x;
 	lastY = y;

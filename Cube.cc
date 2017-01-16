@@ -171,9 +171,9 @@ int Cube::getRotateRow(DirectionE dir)
 	return idx;
 }
 
-bool Cube::parseCommand(const char* cmd, ActionT& act)
+bool Cube::parseCommand(const char* cmdstr, ActionT& act)
 {
-	int len = strlen(cmd);
+	int len = strlen(cmdstr);
 
 	if (len <= 0) return false;
 
@@ -183,15 +183,22 @@ bool Cube::parseCommand(const char* cmd, ActionT& act)
 	RotateAxisE	ax;
 	RotateDirE	cw;
 
+	char cmd = cmdstr[0];
+
 	if (len > 1) {
-		if (cmd[1] == '\'') {	// reverse
+		const char* p = & cmdstr[1];
+
+		if (*p == '\'') {	// reverse
 			reverse = true;
-		} else if (cmd[1] == '2') {	// twice rotate
+			p++;
+		}
+
+		if (*p == '2') {
 			twice_rotate = true;
 		}
 	}
 
-	switch (cmd[0]) {
+	switch (cmd) {
 		case 'u':	ax=AXIS_Y;	cw=ROTATE_CCW;	idx=1<<0;		break;
 		case 'd':	ax=AXIS_Y;	cw=ROTATE_CW;	idx=1<<(N-1);	break;
 		case 'f':	ax=AXIS_Z;	cw=ROTATE_CCW;	idx=1<<0;		break;
