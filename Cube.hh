@@ -7,6 +7,8 @@
 #ifndef __CUBE_HH
 #define __CUBE_HH
 
+#include <stdio.h>
+
 #define dbg(fmt, args...) do { fprintf(stderr, "dbg) " fmt, ## args ); } while(0)
 
 enum ColorE {

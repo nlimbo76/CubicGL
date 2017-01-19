@@ -199,19 +199,19 @@ bool Cube::parseCommand(const char* cmdstr, ActionT& act)
 	}
 
 	switch (cmd) {
-		case 'u':	ax=AXIS_Y;	cw=ROTATE_CCW;	idx=1<<0;		break;
-		case 'd':	ax=AXIS_Y;	cw=ROTATE_CW;	idx=1<<(N-1);	break;
-		case 'f':	ax=AXIS_Z;	cw=ROTATE_CCW;	idx=1<<0;		break;
-		case 'b':	ax=AXIS_Z;	cw=ROTATE_CW; 	idx=1<<(N-1);	break;
-		case 'l':	ax=AXIS_X;	cw=ROTATE_CW; 	idx=1<<0;		break;
-		case 'r':	ax=AXIS_X;	cw=ROTATE_CCW;	idx=1<<(N-1);	break;
+		case 'U':	ax=AXIS_Y;	cw=ROTATE_CCW;	idx=1<<0;		break;
+		case 'D':	ax=AXIS_Y;	cw=ROTATE_CW;	idx=1<<(N-1);	break;
+		case 'F':	ax=AXIS_Z;	cw=ROTATE_CCW;	idx=1<<0;		break;
+		case 'B':	ax=AXIS_Z;	cw=ROTATE_CW; 	idx=1<<(N-1);	break;
+		case 'L':	ax=AXIS_X;	cw=ROTATE_CW; 	idx=1<<0;		break;
+		case 'R':	ax=AXIS_X;	cw=ROTATE_CCW;	idx=1<<(N-1);	break;
 
-		case 'U':	ax=AXIS_Y;	cw=ROTATE_CCW;	idx=3<<0;		break;
-		case 'D':	ax=AXIS_Y;	cw=ROTATE_CW; 	idx=3<<(N-2);	break;
-		case 'F':	ax=AXIS_Z;	cw=ROTATE_CCW;	idx=3<<0;		break;
-		case 'B':	ax=AXIS_Z;	cw=ROTATE_CW; 	idx=3<<(N-2);	break;
-		case 'L':	ax=AXIS_X;	cw=ROTATE_CW; 	idx=3<<0;		break;
-		case 'R':	ax=AXIS_X;	cw=ROTATE_CCW;	idx=3<<(N-2);	break;
+		case 'u':	ax=AXIS_Y;	cw=ROTATE_CCW;	idx=3<<0;		break;
+		case 'd':	ax=AXIS_Y;	cw=ROTATE_CW; 	idx=3<<(N-2);	break;
+		case 'f':	ax=AXIS_Z;	cw=ROTATE_CCW;	idx=3<<0;		break;
+		case 'b':	ax=AXIS_Z;	cw=ROTATE_CW; 	idx=3<<(N-2);	break;
+		case 'l':	ax=AXIS_X;	cw=ROTATE_CW; 	idx=3<<0;		break;
+		case 'r':	ax=AXIS_X;	cw=ROTATE_CCW;	idx=3<<(N-2);	break;
 
 		case 'x':
 		case 'y':

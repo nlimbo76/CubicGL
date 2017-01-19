@@ -9,6 +9,8 @@ float pitch = 30.0;
 float yaw = -30.0;
 float roll = 0.0;
 
+float zoom = 30;
+
 void init()
 {
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -95,7 +97,7 @@ void display()
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 #endif
 
-    glTranslatef(0, 0, -30);
+    glTranslatef(0, 0, -zoom);
     glRotatef(pitch, 1.0, 0.0, 0.0);
     glRotatef(yaw, 0.0, 1.0, 0.0);
     glRotatef(roll, 0.0, 0.0, 1.0);
@@ -185,7 +187,7 @@ void special(int key, int x, int y)
 
 int lastX = 0;
 int lastY = 0;
-bool clicked = false;
+int clicked = GLUT_LEFT_BUTTON;
 
 void mouseClick(int button, int state, int x, int y)
 {
@@ -193,9 +195,19 @@ void mouseClick(int button, int state, int x, int y)
 		if (state == GLUT_DOWN) {
 			lastX = x;
 			lastY = y;
-			clicked = true;
+			clicked = button;
 		} else {
-			clicked = false;
+			clicked = 0;
+		}
+	} else if (button == 3) {	// Wheel up
+		if (state == GLUT_UP) { 
+			zoom -= 2; if (zoom < 0) zoom=0;
+			glutPostRedisplay();
+		}
+	} else if (button == 4) {	// Wheel down
+		if (state == GLUT_UP) {
+			zoom += 2; if (zoom > 50) zoom=50;
+			glutPostRedisplay();
 		}
 	}
 }

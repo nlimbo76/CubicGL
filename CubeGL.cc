@@ -23,8 +23,8 @@ void COLOR(ColorE  col)
 	glColor3f(colors[col][0], colors[col][1], colors[col][2]);
 }
 
-float scale = 0.95;
-float a = 1.0;
+float scale = 1.0;
+float a = 0.95;
 
 
 CubeGL::CubeGL(int dim) : Cube(dim)
@@ -144,6 +144,111 @@ void CubeGL::drawPiece(const CubePiece& piece)
 		glVertex3f(-a, -1, -a);
 		glVertex3f( a, -1, -a);
 	glEnd();
+
+	// draw corners
+	COLOR(NONE);
+	glBegin(GL_TRIANGLES);
+		glVertex3f( a, 1, a);
+		glVertex3f( a, a, 1);
+		glVertex3f( 1, a, a);
+
+		glVertex3f(-a, 1, a);
+		glVertex3f(-1, a, a);
+		glVertex3f(-a, a, 1);
+
+		glVertex3f( a, 1,-a);
+		glVertex3f( 1, a,-a);
+		glVertex3f( a, a,-1);
+
+		glVertex3f(-a, 1,-a);
+		glVertex3f(-a, a,-1);
+		glVertex3f(-1, a,-a);
+
+		glVertex3f( a,-1, a);
+		glVertex3f( 1,-a, a);
+		glVertex3f( a,-a, 1);
+
+		glVertex3f(-a,-1, a);
+		glVertex3f(-a,-a, 1);
+		glVertex3f(-1,-a, a);
+
+		glVertex3f( a,-1,-a);
+		glVertex3f( a,-a,-1);
+		glVertex3f( 1,-a,-a);
+
+		glVertex3f(-a,-1,-a);
+		glVertex3f(-1,-a,-a);
+		glVertex3f(-a,-a,-1);
+
+	glEnd();
+
+	// draw chamfers
+	COLOR(NONE);
+	glBegin(GL_QUADS);
+		glVertex3f( 1, a, a);
+		glVertex3f( a, a, 1);
+		glVertex3f( a,-a, 1);
+		glVertex3f( 1,-a, a);
+
+		glVertex3f( a, a, 1);
+		glVertex3f( a, 1, a);
+		glVertex3f(-a, 1, a);
+		glVertex3f(-a, a, 1);
+
+		glVertex3f(-a, a, 1);
+		glVertex3f(-1, a, a);
+		glVertex3f(-1,-a, a);
+		glVertex3f(-a,-a, 1);
+
+		glVertex3f(-a,-a, 1);
+		glVertex3f(-a,-1, a);
+		glVertex3f( a,-1, a);
+		glVertex3f( a,-a, 1);
+
+		//
+		glVertex3f( 1, a,-a);
+		glVertex3f( 1,-a,-a);
+		glVertex3f( a,-a,-1);
+		glVertex3f( a, a,-1);
+
+		glVertex3f( a, a,-1);
+		glVertex3f(-a, a,-1);
+		glVertex3f(-a, 1,-a);
+		glVertex3f( a, 1,-a);
+
+		glVertex3f(-a, a,-1);
+		glVertex3f(-a,-a,-1);
+		glVertex3f(-1,-a,-a);
+		glVertex3f(-1, a,-a);
+
+		glVertex3f(-a,-a,-1);
+		glVertex3f( a,-a,-1);
+		glVertex3f( a,-1,-a);
+		glVertex3f(-a,-1,-a);
+
+		//
+		glVertex3f( a, 1, a);
+		glVertex3f( 1, a, a);
+		glVertex3f( 1, a,-a);
+		glVertex3f( a, 1,-a);
+
+		glVertex3f(-a, 1, a);
+		glVertex3f(-a, 1,-a);
+		glVertex3f(-1, a,-a);
+		glVertex3f(-1, a, a);
+
+		glVertex3f(-a,-1, a);
+		glVertex3f(-1,-a, a);
+		glVertex3f(-1,-a,-a);
+		glVertex3f(-a,-1,-a);
+
+		glVertex3f( a,-1, a);
+		glVertex3f( a,-1,-a);
+		glVertex3f( 1,-a,-a);
+		glVertex3f( 1,-a, a);
+
+	glEnd();
+
 
 	glPopMatrix();
 }
