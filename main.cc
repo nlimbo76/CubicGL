@@ -1,9 +1,12 @@
 
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 
 #include "CubeGL.hh"
 
 CubeGL cube(3);
+
+float deltaPitch = 0;
+float deltaYaw = 0;
 
 float pitch = 30.0;
 float yaw = -30.0;
@@ -41,6 +44,20 @@ void reshape(GLsizei width, GLsizei height)
  
     glMatrixMode(GL_MODELVIEW);
 }
+
+void drawBitmapText(const char *str, float x, float y, float z)
+{
+    glRasterPos3f(x, y, z); //문자열이 그려질 위치 지정
+ 
+    while (*str)
+    {
+        //GLUT_BITMAP_TIMES_ROMAN_24 폰트를 사용하여 문자열을 그린다.
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *str);
+ 
+        str++;
+    }
+}
+ 
  
 #if 1
 void draw_line()
@@ -53,6 +70,8 @@ void draw_line()
             glVertex3f(5.0, 0.0, 0.0);
             glVertex3f(-5.0, 0.0, 0.0);
         glEnd();
+        drawBitmapText("+X", 5, 0.0, 0.0);
+        drawBitmapText("-X", -5, 0.0, 0.0);
     glPopMatrix();
  
     glPushMatrix(); //Y축 녹색
@@ -61,6 +80,8 @@ void draw_line()
             glVertex3f(0.0, 5.0, 0.0);
             glVertex3f(0.0, -5.0, 0.0);
         glEnd();
+        drawBitmapText("+Y", 0.0, 5, 0.0);
+        drawBitmapText("-Y", 0.0, -5, 0.0);
     glPopMatrix();
  
     glPushMatrix(); //Z축 파란색
@@ -69,6 +90,8 @@ void draw_line()
             glVertex3f(0.0, 0.0, 5.0);
             glVertex3f(0.0, 0.0, -5.0);
         glEnd();
+        drawBitmapText("+Z", 0.0, 0.0, 5);
+        drawBitmapText("-Z", 0.0, 0.0, -5);
     glPopMatrix();
  
     glPopMatrix();
@@ -97,19 +120,25 @@ void display()
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 #endif
 
+	glutBitmapCharacter(GLUT_BITMAP_8_BY_13, 'T');
+	glutBitmapCharacter(GLUT_BITMAP_8_BY_13, 'e');
+	glutBitmapCharacter(GLUT_BITMAP_8_BY_13, 's');
+
     glTranslatef(0, 0, -zoom);
+	pitch += deltaPitch;
+	yaw += deltaYaw;
     glRotatef(pitch, 1.0, 0.0, 0.0);
     glRotatef(yaw, 0.0, 1.0, 0.0);
     glRotatef(roll, 0.0, 0.0, 1.0);
 
+    draw_line();
 
 	cube.draw();
-
-    draw_line();
  
     glutSwapBuffers();
 }
 
+#if 0
 void timer(int value)
 {
 	if (cube.isRotating() == true) {
@@ -118,22 +147,13 @@ void timer(int value)
 
 	glutTimerFunc(30, timer, 0);
 }
+#endif
 
 void keyboard(unsigned char key, int x, int y)
 {
 	if (key == 27) {
 		exit(0);
 	}
-#if 0
-    else if (key == 43) // +키
-    {
-        roll += 5.0;
-    }
-    else if (key == 45) //-키
-    {
-        roll -= 5.0;
-    }
-#endif
 
 	if (key == 'w') {
 		cube.rotate(UP_CW);
@@ -160,78 +180,89 @@ void keyboard(unsigned char key, int x, int y)
 	} else if (key == 'E') {
 		cube.rotate(BACK_CCW);
 	}
-
-	glutPostRedisplay();
 }
 
 void special(int key, int x, int y)
 {
-    if (key == GLUT_KEY_UP)
-    {
-        pitch += 5.0;
-    }
-    else if (key == GLUT_KEY_DOWN)
-    {
-        pitch -= 5.0;
-    }
-    else if (key == GLUT_KEY_RIGHT)
-    {
-        yaw += 5.0;
-    }
-    else if (key == GLUT_KEY_LEFT)
-    {
-        yaw -= 5.0;
-    }
-    glutPostRedisplay();
+	switch (key) {
+		case GLUT_KEY_UP:
+			deltaPitch = 2.0;
+			break;
+		case GLUT_KEY_DOWN:
+			deltaPitch = -2.0;
+			break;
+		case GLUT_KEY_LEFT:
+			deltaYaw = -5.0;
+			break;
+		case GLUT_KEY_RIGHT:
+			deltaYaw = 5.0;
+			break;
+	}
+}
+
+void specialRelease(int key, int x, int y)
+{
+	switch (key) {
+		case GLUT_KEY_UP:
+		case GLUT_KEY_DOWN:
+			deltaPitch = 0;
+			break;
+
+		case GLUT_KEY_LEFT:
+		case GLUT_KEY_RIGHT:
+			deltaYaw = 0;
+			break;
+	}
 }
 
 int lastX = 0;
 int lastY = 0;
 int clicked = GLUT_LEFT_BUTTON;
+int modifier = 0;
 
 void mouseClick(int button, int state, int x, int y)
 {
-	if (button == GLUT_LEFT_BUTTON) {
-		if (state == GLUT_DOWN) {
-			lastX = x;
-			lastY = y;
-			clicked = button;
-		} else {
-			clicked = 0;
-		}
-	} else if (button == 3) {	// Wheel up
-		if (state == GLUT_UP) { 
+	modifier = glutGetModifiers();
+
+	if (state == GLUT_DOWN) {
+		if (button == GLUT_LEFT_BUTTON) {
+			if (state == GLUT_DOWN) {
+				lastX = x;
+				lastY = y;
+				clicked = button;
+			} else {
+				clicked = 0;
+			}
+		} else if (button == 3) {	// wheel up
 			zoom -= 2; if (zoom < 0) zoom=0;
-			glutPostRedisplay();
-		}
-	} else if (button == 4) {	// Wheel down
-		if (state == GLUT_UP) {
+		} else if (button == 4) {	// wheel down
 			zoom += 2; if (zoom > 50) zoom=50;
-			glutPostRedisplay();
 		}
 	}
 }
 
 void mouseMove(int x, int y)
 {
-	int dx = x - lastX;
-	int dy = y - lastY;
+	if (modifier == GLUT_ACTIVE_SHIFT) {
 
-	// scroll limit 
-	if (yaw + dx > 360) yaw = 0;
-	else if (yaw + dx < -360) yaw = 0;
-	else
+	} else {
+		int dx = x - lastX;
+		int dy = y - lastY;
+
+		// scroll limit 
 		yaw += dx;
+		if (yaw > 360) yaw = 0;
+		else if (yaw < -360) yaw = 0;
 
-	if (pitch + dy > 85) pitch = 85;
-	else if (pitch + dy < -85) pitch = -85;
-	else
 		pitch += dy;
+		if (pitch > 85) pitch = 85;
+		else if (pitch < -85) pitch = -85;
 
-	lastX = x;
-	lastY = y;
+		lastX = x;
+		lastY = y;
+	}
 
-    glutPostRedisplay();
+    //glutPostRedisplay();
 }
  
 
@@ -248,8 +279,14 @@ int main(int argc, char** argv)
 	init();
 
 	glutDisplayFunc(display);
+
+	glutIgnoreKeyRepeat(1);
 	glutKeyboardFunc(keyboard);
     glutSpecialFunc(special);
+	glutSpecialUpFunc(specialRelease);
+
+	//glutTimerFunc(30, timer, 0);
+	glutIdleFunc(display);
 
     glutReshapeFunc(reshape);
 
@@ -257,10 +294,7 @@ int main(int argc, char** argv)
 	glutMotionFunc(mouseMove);
 
 
-	glutTimerFunc(30, timer, 0);
-
     glutMainLoop();          
-
 
 	return 0;
 }
